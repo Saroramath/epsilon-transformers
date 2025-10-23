@@ -1,0 +1,42 @@
+# Multipartite Mess3 × Bloch Walk Transformer Training Configuration
+# Based on task specifications: 4-layer transformer with exact architecture
+
+run_id: "multipartite_mess3_bloch_walk"
+experiment_dir: "/lambda/nfs/lasr-group-3/shivam/state/epsilon-transformers/experiments/results"
+
+global_config:
+  device: "cuda"
+  wandb: true
+  wandb_project: "multipartite_epsilon_transformers"
+  sweep_id: "multipartite_experiment"
+  val_every: 1
+  save_every: 100  # Save checkpoint every 100 epochs
+  scheduler: true  # Use ReduceLROnPlateau
+  process_dir: null
+
+# Transformer Architecture (exact specifications from task)
+model_config:
+  n_layers: 4                 # 4-layer model
+  n_heads: 4                  # 4 attention heads
+  d_head: 16                  # 16 dimensions per head (4*16=64 total)
+  d_model: 64                 # 64-dimensional embeddings
+  d_mlp: 256                  # 256-dimensional feed-forward network
+  act_fn: "relu"              # ReLU activation
+  n_ctx: 8                    # Fixed sequences of 8 tokens
+  normalization_type: "LN"    # Layer normalization before each sub-layer
+  positional_embedding_type: "standard"  # Learned positional embeddings
+  dtype: "float32"
+  d_vocab: 13                 # Will be set dynamically (12 + BOS)
+
+# Training Configuration (exact specifications from task)
+train_config:
+  n_epochs: 20000            # 20,000 epochs
+  learning_rate: 0.0001      # 1×10^-4
+  batch_size: 256            # Larger than spec (128) since we have H100
+  batches_per_epoch: 200     # 200 batches per epoch
+  bos: true                  # Include beginning-of-sequence token
+  train_type: "normal"       # Use Adam optimizer
+
+# Process configuration - unused since we generate data directly
+process_config:
+  name: "multipartite"

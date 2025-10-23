@@ -44,3 +44,8 @@ temp/
 scripts/activation_analysis/all_figs.ipynb
 scripts/activation_analysis/all_figs_Final.ipynb
 scripts/activation_analysis/all_figs_new_for_paul.ipynb
+
+# API keys and secrets
+**/.hf_key
+**/.wandb_key
+*.key

@@ -1,0 +1,41 @@
+# Fast Multipartite Mess3 × Bloch Walk Training Configuration
+# Optimized for H100 GPU with speed optimizations
+
+run_id: "multipartite_fast_h100"
+experiment_dir: "/lambda/nfs/lasr-group-3/shivam/state/epsilon-transformers/experiments/results"
+
+global_config:
+  device: "cuda"
+  wandb: true
+  wandb_project: "multipartite_epsilon_transformers"
+  sweep_id: "multipartite_fast_experiment"
+  val_every: 50        # Validate less frequently
+  save_every: 500      # Save less frequently
+  scheduler: true      # Use ReduceLROnPlateau for faster convergence
+  process_dir: null
+
+# Same architecture as research spec
+model_config:
+  n_layers: 4
+  n_heads: 4
+  d_head: 16
+  d_model: 64
+  d_mlp: 256
+  act_fn: "relu"
+  n_ctx: 8
+  normalization_type: "LN"
+  positional_embedding_type: "standard"
+  dtype: "float32"             # Base precision (AMP handles mixed precision)
+  d_vocab: 13
+
+# Optimized training for speed
+train_config:
+  n_epochs: 5000               # Reduce from 20k (should be sufficient)
+  learning_rate: 0.001         # Higher LR for faster convergence
+  batch_size: 1024             # Much larger batches for H100
+  batches_per_epoch: 100       # Fewer batches but larger
+  bos: true
+  train_type: "normal"
+
+process_config:
+  name: "multipartite"

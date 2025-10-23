@@ -1,0 +1,41 @@
+# Test Configuration for Multipartite Training
+# Small scale test to verify pipeline works
+
+run_id: "multipartite_test"
+experiment_dir: "/lambda/nfs/lasr-group-3/shivam/state/epsilon-transformers/experiments/results"
+
+global_config:
+  device: "cuda"
+  wandb: false  # Disable for test
+  wandb_project: "multipartite_epsilon_transformers"
+  sweep_id: "test_run"
+  val_every: 1
+  save_every: 5  # Save every 5 epochs for test
+  scheduler: false  # Simplify for test
+  process_dir: null
+
+# Smaller model for testing
+model_config:
+  n_layers: 2                 # 2 layers instead of 4
+  n_heads: 2                  # 2 heads instead of 4
+  d_head: 8                   # 8 dimensions per head
+  d_model: 16                 # 16-dimensional embeddings
+  d_mlp: 64                   # 64-dimensional feed-forward
+  act_fn: "relu"
+  n_ctx: 4                    # Short sequences for test
+  normalization_type: "LN"
+  positional_embedding_type: "standard"
+  dtype: "float32"
+  d_vocab: 13                 # Will be set dynamically
+
+# Short training for test
+train_config:
+  n_epochs: 10               # Just 10 epochs
+  learning_rate: 0.001       # Higher LR for faster test
+  batch_size: 32             # Smaller batches
+  batches_per_epoch: 10      # Fewer batches
+  bos: true
+  train_type: "normal"
+
+process_config:
+  name: "multipartite"
