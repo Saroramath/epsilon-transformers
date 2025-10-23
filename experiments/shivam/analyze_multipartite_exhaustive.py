@@ -26,6 +26,7 @@ def project_to_simplex_2d(beliefs):
     """
     Project 3D belief states to 2D using barycentric coordinates.
     Critical for visualizing Sierpiński triangle fractals!
+    Used for Mess3.
     """
     x = beliefs[:, 0] - beliefs[:, 1] / 2 - beliefs[:, 2] / 2
     y = np.sqrt(3) / 2 * (beliefs[:, 1] - beliefs[:, 2])
@@ -35,6 +36,15 @@ def project_to_simplex_2d(beliefs):
     y_rot = x
 
     return x_rot, y_rot
+
+
+def project_direct_indexing(beliefs, inds=[1, 2]):
+    """
+    Direct indexing of belief dimensions for visualization.
+    Used for TomQA/Bloch Walk - plots dimensions [1, 2] directly.
+    Matches Fig2.py approach for TomQA.
+    """
+    return beliefs[:, inds[0]], beliefs[:, inds[1]]
 
 
 def compute_orthogonality(W1, W2):
@@ -263,7 +273,7 @@ def main():
     # Create visualizations
     fig, axes = plt.subplots(2, 3, figsize=(18, 12))
 
-    # Row 1: Mess3
+    # Row 1: Mess3 (use simplex projection)
     x_true, y_true = project_to_simplex_2d(y_mess3_true[indices])
     axes[0, 0].scatter(x_true, y_true, alpha=0.3, s=1, c='blue')
     axes[0, 0].set_title('Mess3: Ground Truth\n(Simplex Projection)')
@@ -280,26 +290,26 @@ def main():
     axes[0, 2].set_aspect('equal')
     axes[0, 2].legend()
 
-    # Row 2: Bloch Walk (simplex projection - same as Mess3)
-    x_true_bloch, y_true_bloch = project_to_simplex_2d(y_bloch_true[indices])
+    # Row 2: Bloch Walk (use direct indexing [1, 2] like TomQA in Fig2.py)
+    x_true_bloch, y_true_bloch = project_direct_indexing(y_bloch_true[indices], inds=[1, 2])
     axes[1, 0].scatter(x_true_bloch, y_true_bloch, alpha=0.3, s=1, c='blue')
-    axes[1, 0].set_title('Bloch Walk: Ground Truth\n(Simplex Projection)')
-    axes[1, 0].set_xlabel('Barycentric X')
-    axes[1, 0].set_ylabel('Barycentric Y')
+    axes[1, 0].set_title('Bloch Walk: Ground Truth\n(Direct Indexing [1,2])')
+    axes[1, 0].set_xlabel('Belief Dimension 1')
+    axes[1, 0].set_ylabel('Belief Dimension 2')
     axes[1, 0].set_aspect('equal')
 
-    x_pred_bloch, y_pred_bloch = project_to_simplex_2d(y_bloch_pred[indices])
+    x_pred_bloch, y_pred_bloch = project_direct_indexing(y_bloch_pred[indices], inds=[1, 2])
     axes[1, 1].scatter(x_pred_bloch, y_pred_bloch, alpha=0.3, s=1, c='red')
     axes[1, 1].set_title(f'Bloch Walk: Predicted\n(R² = {results[best_layer]["r2_bloch"]:.3f})')
-    axes[1, 1].set_xlabel('Barycentric X')
-    axes[1, 1].set_ylabel('Barycentric Y')
+    axes[1, 1].set_xlabel('Belief Dimension 1')
+    axes[1, 1].set_ylabel('Belief Dimension 2')
     axes[1, 1].set_aspect('equal')
 
     axes[1, 2].scatter(x_true_bloch, y_true_bloch, alpha=0.2, s=1, c='blue', label='True')
     axes[1, 2].scatter(x_pred_bloch, y_pred_bloch, alpha=0.2, s=1, c='red', label='Pred')
     axes[1, 2].set_title('Bloch Walk: Overlay')
-    axes[1, 2].set_xlabel('Barycentric X')
-    axes[1, 2].set_ylabel('Barycentric Y')
+    axes[1, 2].set_xlabel('Belief Dimension 1')
+    axes[1, 2].set_ylabel('Belief Dimension 2')
     axes[1, 2].legend()
     axes[1, 2].set_aspect('equal')
 

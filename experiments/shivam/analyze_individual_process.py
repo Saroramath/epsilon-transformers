@@ -20,7 +20,10 @@ from epsilon_transformers.analysis.activation_analysis import get_beliefs_for_nn
 
 
 def project_to_simplex_2d(beliefs):
-    """Project 3D belief states to 2D using barycentric coordinates."""
+    """
+    Project 3D belief states to 2D using barycentric coordinates.
+    Used for Mess3.
+    """
     x = beliefs[:, 0] - beliefs[:, 1] / 2 - beliefs[:, 2] / 2
     y = np.sqrt(3) / 2 * (beliefs[:, 1] - beliefs[:, 2])
 
@@ -29,6 +32,15 @@ def project_to_simplex_2d(beliefs):
     y_rot = x
 
     return x_rot, y_rot
+
+
+def project_direct_indexing(beliefs, inds=[1, 2]):
+    """
+    Direct indexing of belief dimensions for visualization.
+    Used for TomQA/Bloch Walk - plots dimensions [1, 2] directly.
+    Matches Fig2.py approach for TomQA.
+    """
+    return beliefs[:, inds[0]], beliefs[:, inds[1]]
 
 
 def main(process_name):
@@ -179,29 +191,41 @@ def main(process_name):
     n_vis = min(3000, len(y_true))
     indices = np.random.choice(len(y_true), n_vis, replace=False)
 
+    # Choose projection method based on process (matching Fig2.py)
+    if process_name == 'mess3':
+        # Mess3: use simplex projection
+        x_true, y_true_proj = project_to_simplex_2d(y_true[indices])
+        x_pred, y_pred_proj = project_to_simplex_2d(y_pred[indices])
+        projection_label = 'Simplex Projection'
+        xlabel, ylabel = 'Barycentric X', 'Barycentric Y'
+    else:  # bloch (TomQA)
+        # Bloch Walk: use direct indexing [1, 2]
+        x_true, y_true_proj = project_direct_indexing(y_true[indices], inds=[1, 2])
+        x_pred, y_pred_proj = project_direct_indexing(y_pred[indices], inds=[1, 2])
+        projection_label = 'Direct Indexing [1,2]'
+        xlabel, ylabel = 'Belief Dimension 1', 'Belief Dimension 2'
+
     # Create visualizations
     fig, axes = plt.subplots(1, 3, figsize=(18, 6))
 
-    x_true, y_true_proj = project_to_simplex_2d(y_true[indices])
     axes[0].scatter(x_true, y_true_proj, alpha=0.3, s=1, c='blue')
-    axes[0].set_title(f'{process_name.capitalize()}: Ground Truth\n(Simplex Projection)')
+    axes[0].set_title(f'{process_name.capitalize()}: Ground Truth\n({projection_label})')
     axes[0].set_aspect('equal')
-    axes[0].set_xlabel('Barycentric X')
-    axes[0].set_ylabel('Barycentric Y')
+    axes[0].set_xlabel(xlabel)
+    axes[0].set_ylabel(ylabel)
 
-    x_pred, y_pred_proj = project_to_simplex_2d(y_pred[indices])
     axes[1].scatter(x_pred, y_pred_proj, alpha=0.3, s=1, c='red')
     axes[1].set_title(f'{process_name.capitalize()}: Predicted\n(R² = {results[best_layer]["r2"]:.3f})')
     axes[1].set_aspect('equal')
-    axes[1].set_xlabel('Barycentric X')
-    axes[1].set_ylabel('Barycentric Y')
+    axes[1].set_xlabel(xlabel)
+    axes[1].set_ylabel(ylabel)
 
     axes[2].scatter(x_true, y_true_proj, alpha=0.2, s=1, c='blue', label='True')
     axes[2].scatter(x_pred, y_pred_proj, alpha=0.2, s=1, c='red', label='Pred')
     axes[2].set_title(f'{process_name.capitalize()}: Overlay')
     axes[2].set_aspect('equal')
-    axes[2].set_xlabel('Barycentric X')
-    axes[2].set_ylabel('Barycentric Y')
+    axes[2].set_xlabel(xlabel)
+    axes[2].set_ylabel(ylabel)
     axes[2].legend()
 
     plt.tight_layout()
