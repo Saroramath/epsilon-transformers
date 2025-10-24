@@ -220,6 +220,17 @@ def main():
     print(f"  Bloch probs: {bloch_probs_flat.shape}")
     print()
 
+    # DIAGNOSTIC: Check belief variance
+    print(f"Belief statistics:")
+    print(f"  Mess3 belief variance per dim: {[f'{np.var(mess3_beliefs_flat[:, i]):.6f}' for i in range(3)]}")
+    print(f"  Bloch belief variance per dim: {[f'{np.var(bloch_beliefs_flat[:, i]):.6f}' for i in range(3)]}")
+    print(f"  Mess3 belief mean per dim: {[f'{np.mean(mess3_beliefs_flat[:, i]):.4f}' for i in range(3)]}")
+    print(f"  Bloch belief mean per dim: {[f'{np.mean(bloch_beliefs_flat[:, i]):.4f}' for i in range(3)]}")
+    print(f"  Bloch belief min/max dim 0: [{np.min(bloch_beliefs_flat[:, 0]):.4f}, {np.max(bloch_beliefs_flat[:, 0]):.4f}]")
+    print(f"  Bloch belief min/max dim 1: [{np.min(bloch_beliefs_flat[:, 1]):.4f}, {np.max(bloch_beliefs_flat[:, 1]):.4f}]")
+    print(f"  Bloch belief min/max dim 2: [{np.min(bloch_beliefs_flat[:, 2]):.4f}, {np.max(bloch_beliefs_flat[:, 2]):.4f}]")
+    print()
+
     # =================================================================
     # ANALYSIS 1: SAE Features → Belief States
     # =================================================================
@@ -302,6 +313,16 @@ def main():
     # Find features most correlated with each process
     max_mess3_corr = np.max(np.abs(mess3_correlations), axis=1)
     max_bloch_corr = np.max(np.abs(bloch_correlations), axis=1)
+
+    # DIAGNOSTIC: Check for NaN values
+    print(f"Correlation diagnostics:")
+    print(f"  NaN in Mess3 correlations: {np.isnan(mess3_correlations).sum()} / {mess3_correlations.size}")
+    print(f"  NaN in Bloch correlations: {np.isnan(bloch_correlations).sum()} / {bloch_correlations.size}")
+    print(f"  NaN in max_mess3_corr: {np.isnan(max_mess3_corr).sum()} / {len(max_mess3_corr)}")
+    print(f"  NaN in max_bloch_corr: {np.isnan(max_bloch_corr).sum()} / {len(max_bloch_corr)}")
+    print(f"  Max Mess3 correlation range: [{np.nanmin(max_mess3_corr):.4f}, {np.nanmax(max_mess3_corr):.4f}]")
+    print(f"  Max Bloch correlation range: [{np.nanmin(max_bloch_corr):.4f}, {np.nanmax(max_bloch_corr):.4f}]")
+    print()
 
     # Features strongly correlated with Mess3
     mess3_features = np.where(max_mess3_corr > 0.3)[0]

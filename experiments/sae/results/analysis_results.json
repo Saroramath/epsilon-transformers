@@ -1,0 +1,20 @@
+{
+  "sae_to_beliefs": {
+    "mess3_r2": 0.20361948013305664,
+    "bloch_r2": 0.4616770346959432
+  },
+  "raw_activations_to_beliefs": {
+    "mess3_r2": 0.20393836498260498,
+    "bloch_r2": 0.4615417718887329
+  },
+  "feature_separation": {
+    "n_mess3_features": 8,
+    "n_bloch_features": 0,
+    "n_entangled_features": 0
+  },
+  "sparsity": {
+    "overall": 0.24826374650001526,
+    "active_1pct": 104,
+    "active_5pct": 98
+  }
+}
